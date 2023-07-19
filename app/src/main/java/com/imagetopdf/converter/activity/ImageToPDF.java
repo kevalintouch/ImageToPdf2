@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -29,17 +30,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.AppCompatSpinner;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -47,9 +45,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 import com.imagetopdf.converter.Adapter.AdapterGridBasic;
 import com.imagetopdf.converter.Adapter.ImageDocument;
 import com.imagetopdf.converter.Adapter.SpacingItemDecoration;
@@ -59,16 +55,19 @@ import com.imagetopdf.converter.Utils.FileComparator;
 import com.imagetopdf.converter.Utils.ImageToPDFAsync;
 import com.imagetopdf.converter.Utils.ItemTouchHelperClass;
 import com.imagetopdf.converter.Utils.RecyclerViewEmptySupport;
-import com.imagetopdf.converter.Utils.ViewAnimation;
 import com.imagetopdf.converter.photopicker.activity.PickImageActivity;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public class ImageToPDF extends AppCompatActivity {
@@ -87,15 +86,11 @@ public class ImageToPDF extends AppCompatActivity {
     private CircularProgressBar progressBar;
     private TextView progressBarPercentage;
     private TextView progressBarCount;
-    private TextInputLayout textInputLayout;
     private EditText passwordText;
     AppCompatCheckBox securePDF;
     public ItemTouchHelper itemTouchHelper;
     private ActionModeCallback actionModeCallback;
     private ActionMode actionMode;
-    LinearLayout mParentFloatButton;
-    FloatingActionButton maddCameraFAB;
-    FloatingActionButton maddFilesFAB;
     private boolean rotate = false;
     private String mCurrentCameraFile;
     private Dialog bottomSheetDialog;
@@ -104,82 +99,51 @@ public class ImageToPDF extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_to_pdf);
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.activity_image_to_pdf2);
+        mainActivity = this;
         initComponent();
         //Initiating fab buttons
         InitFabButtons();
+        InitBottomSheetProgress();
+        actionModeCallback = new ActionModeCallback();
+        performFileSearch();
+    }
 
-
-        FloatingActionButton mConvertToPDF = findViewById(R.id.converttopdf);
-        mConvertToPDF.setOnClickListener(new View.OnClickListener() {
+    private void InitFabButtons() {
+        setSupportActionBar(findViewById(R.id.title_rl));
+        findViewById(R.id.converttopdf).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 convertToPDF();
 
             }
         });
-        Intent intent = getIntent();
-        String message = intent.getStringExtra("ActivityAction");
-        if (message.equals("FileSearch")) {
-            performFileSearch();
-        } else if (message.equals("CameraActivity")) {
-            StartCameraActivity();
-        }
-        mainActivity = this;
-        InitBottomSheetProgress();
-        actionModeCallback = new ActionModeCallback();
-
-
-    }
-
-    private void InitFabButtons() {
-        maddCameraFAB = findViewById(R.id.addCameraFAB);
-        maddFilesFAB = findViewById(R.id.addFilesFAB);
-        mParentFloatButton = findViewById(R.id.parentfloatbutton);
-        ViewAnimation.initShowOut(maddCameraFAB);
-        ViewAnimation.initShowOut(maddFilesFAB);
-        CoordinatorLayout mCoordLayout = findViewById(R.id.myCoordinatorLayout);
-        FloatingActionButton mAddPDFFAB = findViewById(R.id.fabadd);
-        FloatingActionButton mCollageIt = findViewById(R.id.collageit);
-        mAddPDFFAB.setOnClickListener(new View.OnClickListener() {
-
-            @SuppressWarnings("deprecation")
+        findViewById(R.id.fabadd).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                rotate = ViewAnimation.rotateFab(v, !rotate);
-                if (rotate) {
-                    ViewAnimation.showIn(maddCameraFAB);
-                    ViewAnimation.showIn(maddFilesFAB);
-                } else {
-                    ViewAnimation.showOut(maddCameraFAB);
-                    ViewAnimation.showOut(maddFilesFAB);
-                }
+                finish();
             }
         });
-        maddFilesFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                performFileSearch();
-            }
 
-        });
-        maddCameraFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                StartCameraActivity();
-            }
-
-        });
-
-        mCollageIt.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.collageit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startImageToPDF();
             }
 
+        });
+        findViewById(R.id.ivBack).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+        findViewById(R.id.ivSort).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
         });
     }
 
@@ -202,22 +166,32 @@ public class ImageToPDF extends AppCompatActivity {
         if (documents.size() < 1) {
             Toast.makeText(this, "You need to add at least 1 image file", Toast.LENGTH_LONG).show();
         } else {
-            final Dialog dialog = new Dialog(mainActivity);
+            final Dialog dialog = new Dialog(mainActivity, android.R.style.Theme_DeviceDefault_NoActionBar_Fullscreen);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+
             final View alertView = getLayoutInflater().inflate(R.layout.file_alert_dialog, null);
             LinearLayout layout = (LinearLayout) alertView.findViewById(R.id.savePDFLayout);
-            textInputLayout = (TextInputLayout) alertView.findViewById(R.id.editTextPassword);
             passwordText = (EditText) alertView.findViewById(R.id.password);
+            passwordText.requestFocus();
             securePDF = (AppCompatCheckBox) alertView.findViewById(R.id.securePDF);
+
+            alertView.findViewById(R.id.main_layout).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
             securePDF.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
                     if (b) {
-                        textInputLayout.setVisibility(View.VISIBLE);
+                        passwordText.setVisibility(View.VISIBLE);
 
                     } else {
-                        textInputLayout.setVisibility(View.GONE);
+                        passwordText.setVisibility(View.GONE);
                     }
 
                 }
@@ -252,16 +226,24 @@ public class ImageToPDF extends AppCompatActivity {
             compression.setAdapter(compressionArray);
             compression.setSelection(2);
 
+            Date c = Calendar.getInstance().getTime();
+            System.out.println("Current time => " + c);
+
+            SimpleDateFormat df = new SimpleDateFormat("HHmmssddMMyyyy", Locale.getDefault());
+            String filename = "imgtoPDF_"+df.format(c);
+
             final EditText edittext = (EditText) alertView.findViewById(R.id.editText2);
+            edittext.requestFocus();
             dialog.setContentView(alertView);
             dialog.setCancelable(true);
+            edittext.setText(filename);
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(dialog.getWindow().getAttributes());
             lp.width = WindowManager.LayoutParams.MATCH_PARENT;
             lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             dialog.show();
             dialog.getWindow().setAttributes(lp);
-            ((ImageButton) dialog.findViewById(R.id.bt_close)).setOnClickListener(new View.OnClickListener() {
+            (dialog.findViewById(R.id.bt_close)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     dialog.dismiss();
@@ -301,7 +283,7 @@ public class ImageToPDF extends AppCompatActivity {
     }
 
     private void initComponent() {
-        documents = new ArrayList<ImageDocument>();
+        documents = new ArrayList<>();
         RecyclerViewEmptySupport recyclerView = (RecyclerViewEmptySupport) findViewById(R.id.recyclerView);
         recyclerView.setEmptyView(findViewById(R.id.toDoEmptyView));
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
@@ -314,11 +296,9 @@ public class ImageToPDF extends AppCompatActivity {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 if (dy > 0) {
-                    if (mParentFloatButton.getVisibility() == View.VISIBLE)
-                        mParentFloatButton.setVisibility(View.GONE);
+
                 } else if (dy < 0) {
-                    if (mParentFloatButton.getVisibility() != View.VISIBLE)
-                        mParentFloatButton.setVisibility(View.VISIBLE);
+
                 }
             }
         });
@@ -424,7 +404,7 @@ public class ImageToPDF extends AppCompatActivity {
             }
         }
         if (requestCode == REQUEST_COLLAGE && resultCode == Activity.RESULT_OK) {
-            makeResult();
+//            makeResult(filepath);
         }
     }
 
@@ -447,7 +427,6 @@ public class ImageToPDF extends AppCompatActivity {
         Resources r = c.getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
-
 
     public List<String> lstPaths;
 
@@ -504,7 +483,6 @@ public class ImageToPDF extends AppCompatActivity {
     }
 
     private void InitBottomSheetProgress() {
-
         bottomSheetDialog = new Dialog(this);
         bottomSheetDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         bottomSheetDialog.setContentView(R.layout.progressdialog);
@@ -536,18 +514,18 @@ public class ImageToPDF extends AppCompatActivity {
         this.progressBarPercentage.setText(percentage + "%");
     }
 
-    public void runPostExecution(Boolean isMergeSuccess) {
+    public void runPostExecution(File filepath) {
         bottomSheetDialog.dismiss();
         progressBarPercentage.setText("0%");
         this.progressBar.setProgress(0);
-        makeResult();
+        makeResult(filepath);
     }
 
-    public void makeResult() {
-//        Intent i = new Intent();
-//        this.setResult(RESULT_OK, i);
-//        this.finish();
-        Toast.makeText(mainActivity, "Done", Toast.LENGTH_SHORT).show();
+    public void makeResult(File filepath) {
+        Toast.makeText(mainActivity, "PDF created successfully", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(ImageToPDF.this, SavedActivity.class);
+        i.putExtra("FILEPATH",filepath.getAbsolutePath());
+        startActivity(i);
     }
 
     private void CheckStoragePermission() {
@@ -657,7 +635,6 @@ public class ImageToPDF extends AppCompatActivity {
     private MenuItem mainMenuItem;
     private boolean isChecked = false;
 
-    //>>>>>>>>>>>>MENU
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

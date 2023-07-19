@@ -113,6 +113,7 @@
             android:layout_gravity="center_vertical|end"
             android:background="@drawable/bg_blue"
             android:gravity="center_vertical|end"
+            android:layout_marginEnd="@dimen/_5sdp"
             android:paddingStart="@dimen/_20sdp"
             android:paddingTop="@dimen/_5sdp"
             android:paddingEnd="@dimen/_20sdp"

@@ -2,6 +2,7 @@ package com.imagetopdf.converter.Utils;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Environment;
 
 import com.imagetopdf.converter.Adapter.ImageDocument;
 import com.imagetopdf.converter.activity.ImageToPDF;
@@ -19,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class ImageToPDFAsync extends AsyncTask<Void, Integer, Boolean> {
+public class ImageToPDFAsync extends AsyncTask<Void, Integer, File> {
 
     List<ImageDocument> mdocuments = null;
     private OnPostExecuteListener mListener = null;
@@ -70,8 +71,8 @@ public class ImageToPDFAsync extends AsyncTask<Void, Integer, Boolean> {
 
 
     @Override
-    protected Boolean doInBackground(Void... voids) {
-        File root = imageToPDF.getFilesDir();
+    protected File doInBackground(Void... voids) {
+        File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         File myDir = new File(root + "/ImageToPDF");
         if (!myDir.exists()) {
             myDir.mkdirs();
@@ -136,10 +137,10 @@ public class ImageToPDFAsync extends AsyncTask<Void, Integer, Boolean> {
         } catch (Exception ex) {
 
         }
-        return true;
+        return file;
     }
 
-    public void onPostExecute(Boolean bool) {
+    public void onPostExecute(File bool) {
         imageToPDF.runPostExecution(bool);
     }
 

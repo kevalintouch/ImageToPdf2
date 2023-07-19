@@ -8,4 +8,5 @@
     android:singleLine="true"
     android:text="asdasdasd"
     android:textAlignment="inherit"
+    android:textColor="@color/white"
     android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />

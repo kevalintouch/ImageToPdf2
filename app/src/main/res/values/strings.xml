@@ -37,4 +37,5 @@
     <string name="maybe_later">Maybe later</string>
     <string name="image_to_pd">Image to PDF</string>
     <string name="image_to_pd1">Import Images or Scan with your Camera to \ngenerate PDFs</string>
+    <string name="convert_to_pdf">Convert to PDF</string>
 </resources>

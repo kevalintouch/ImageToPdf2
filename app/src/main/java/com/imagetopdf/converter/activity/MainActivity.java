@@ -15,22 +15,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.AppCompatCheckBox;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ShareCompat;
@@ -40,15 +35,11 @@ import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
 import com.imagetopdf.converter.Adapter.MainRecycleViewAdapter;
 import com.imagetopdf.converter.BuildConfig;
 import com.imagetopdf.converter.R;
 import com.imagetopdf.converter.Utils.FileComparator;
-import com.imagetopdf.converter.Utils.PDFOCRAsync;
 import com.imagetopdf.converter.Utils.RecyclerViewEmptySupport;
-import com.imagetopdf.converter.Utils.ViewAnimation;
 import com.imagetopdf.converter.photopicker.activity.PickImageActivity;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
@@ -87,19 +78,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.title_rl);
         setSupportActionBar(toolbar);
-        setTitle("Saved PDF");
         CheckStoragePermission();
 
         mSharedPreferences = getSharedPreferences("configuration", MODE_PRIVATE);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                StartMergeActivity();
-            }
-        });
+        findViewById(R.id.fab).setOnClickListener(view -> StartMergeActivity());
 
         CheckStoragePermission();
 
@@ -117,6 +101,12 @@ public class MainActivity extends AppCompatActivity {
         currentActivity = this;
         InitBottomSheetProgress();
 
+        findViewById(R.id.ivBack).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     public void StartMergeActivity() {
@@ -541,45 +531,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        view.findViewById(R.id.lyt_rename).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mBottomSheetDialog.dismiss();
-                showCustomRenameDialog(currentFile);
-
-            }
-        });
-
         view.findViewById(R.id.lyt_delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mBottomSheetDialog.dismiss();
                 showCustomDeleteDialog(currentFile);
-
-            }
-        });
-
-        view.findViewById(R.id.lyt_copyTo).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                startActivityForResult(intent, RQS_OPEN_DOCUMENT_TREE);
-                selectedFile = currentFile;
-            }
-        });
-
-        view.findViewById(R.id.lyt_ocr).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mBottomSheetDialog.dismiss();
-                PDFOCRAsync pdfocrAsync = new PDFOCRAsync(currentFile, currentActivity);
-                try {
-                    pdfocrAsync.openRenderer();
-                    pdfocrAsync.execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
             }
         });
@@ -598,13 +554,14 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
-                    //Snackbar.make(mCoordLayout, "Install PDF reader application.", Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Install PDF reader application", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
-        mBottomSheetDialog = new BottomSheetDialog(this);
+        mBottomSheetDialog = new BottomSheetDialog(this,R.style.CustomBottomSheetDialogTheme);
         mBottomSheetDialog.setContentView(view);
+        mBottomSheetDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
         mBottomSheetDialog.show();
         mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -613,34 +570,6 @@ public class MainActivity extends AppCompatActivity {
                 mBottomSheetDialog = null;
             }
         });
-    }
-
-    public void showCustomRenameDialog(final File currentFile) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = this.getLayoutInflater();
-        View view = inflater.inflate(R.layout.rename_layout, null);
-        builder.setView(view);
-        final EditText editText = view.findViewById(R.id.renameEditText2);
-        editText.setText(currentFile.getName());
-        builder.setTitle("Rename");
-        builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                File root = getFilesDir();
-                File file = new File(root + "/ImageToPDF", editText.getText().toString());
-                currentFile.renameTo(file);
-                dialog.dismiss();
-                CreateDataSource();
-                mAdapter.notifyItemInserted(items.size() - 1);
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     public void showCustomDeleteDialog(final File currentFile) {
@@ -720,7 +649,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void InitBottomSheetProgress() {
-
         ocrProgressdialog = new Dialog(this);
         ocrProgressdialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         ocrProgressdialog.setContentView(R.layout.progressdialog);
@@ -776,7 +704,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     startActivity(intent);
                 } catch (ActivityNotFoundException e) {
-                    //Snackbar.make(mCoordLayout, "Install PDF reader application.", Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Install PDF reader application", Toast.LENGTH_SHORT).show();
                 }
             }
         });

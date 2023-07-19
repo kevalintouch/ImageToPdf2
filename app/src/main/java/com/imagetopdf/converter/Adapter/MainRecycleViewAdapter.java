@@ -9,9 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.imagetopdf.converter.R;
+import com.imagetopdf.converter.Utils.Helper;
+import com.imagetopdf.converter.activity.SavedActivity;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -22,7 +25,7 @@ import java.util.List;
 
 public class MainRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    public List<File> items = new ArrayList<>();
+    public List<File> items;
 
     private OnLoadMoreListener onLoadMoreListener;
     private SparseBooleanArray selected_items;
@@ -71,7 +74,6 @@ public class MainRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final File obj = items.get(position);
@@ -83,14 +85,6 @@ public class MainRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             String strDate = formatter.format(lastModDate);
             view.brief.setText(strDate);
             view.size.setText(GetSize(obj.length()));
-           /* view.image.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mOnItemClickListener != null) {
-                        mOnItemClickListener.onItemClick(view,items.get(position), position);
-                    }
-                }
-            });*/
 
             view.lyt_parent.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -108,7 +102,7 @@ public class MainRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 }
             });
             toggleCheckedIcon(holder, position);
-            view.image.setImageResource(R.drawable.ic_iconfinder_24_2133056);
+            Helper.generateImageFromPdf(ctx, FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".provider", obj), view.image);
         }
     }
 

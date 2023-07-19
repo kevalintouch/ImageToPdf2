@@ -4,6 +4,7 @@
     <item
         android:id="@+id/fileSort"
         android:title="Modified"
+        android:icon="@drawable/ic_sort_icon"
         app:showAsAction="ifRoom">
         <!-- "file" submenu -->
         <menu>
@@ -21,7 +22,7 @@
     <item
         android:id="@+id/ordering"
         android:icon="@drawable/ic_keyboard_arrow_down_black_24dp"
+        android:iconTint="@color/dark_blue"
         android:title="Size"
-        android:iconTint="@android:color/white"
         app:showAsAction="ifRoom" />
 </menu>

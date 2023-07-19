@@ -1,27 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/docviewer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
     tools:context=".activity.PdfCreater">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/title_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:background="@drawable/circle_gray2"
+                android:foreground="@drawable/ripple_effect"
+                android:padding="@dimen/_5sdp"
+                android:src="@drawable/img_back" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_toEndOf="@+id/ivBack"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Docs Collage PDF"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/_12sdp" />
+            <TextView
+                android:id="@+id/saveTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:foreground="@drawable/ripple_effect"
+                android:padding="@dimen/_6sdp"
+                android:text="Save PDF"
+                android:visibility="gone"
+                android:textColor="@color/dark_blue"
+                android:textSize="@dimen/_12sdp" />
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
         android:id="@+id/listParentView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-    </LinearLayout>
-
+        android:layout_below="@+id/title_rl"
+        android:orientation="vertical" />
 
     <HorizontalScrollView
         android:id="@+id/collageParent"
         android:layout_width="match_parent"
-        android:layout_alignBottom="@+id/listParentView"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/listParentView"
         android:background="@color/grey_91">
 
         <LinearLayout

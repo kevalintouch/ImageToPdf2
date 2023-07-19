@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.SizeF;
 import android.view.View;
 import android.view.ViewGroup;
@@ -239,7 +240,7 @@ public class PdfDocument {
     }
 
     public void PrintPDF(final String fileName) {
-        new AsyncTask<String, Integer, Boolean>() {
+        new AsyncTask<String, Integer, File>() {
 
             @Override
             protected void onPreExecute() {
@@ -248,11 +249,11 @@ public class PdfDocument {
             }
 
             @Override
-            protected Boolean doInBackground(String... strings) {
+            protected File doInBackground(String... strings) {
 
+                File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
+                File myDir = new File(root + "/ImageToPDF");
                 try {
-                    File root = createrActiviry.getFilesDir();
-                    File myDir = new File(root + "/ImageToPDF");
                     if (!myDir.exists()) {
                         myDir.mkdirs();
                     }
@@ -296,16 +297,17 @@ public class PdfDocument {
                     }
 
                     destination.close();
+                    return myDir;
 
                 } catch (
                         Exception ex) {
                     String message = ex.getMessage();
                 }
-                return null;
+                return myDir;
             }
 
             @Override
-            protected void onPostExecute(Boolean result) {
+            protected void onPostExecute(File result) {
                 createrActiviry.runPostExecution(result);
             }
 

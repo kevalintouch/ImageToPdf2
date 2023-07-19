@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.MainActivity"
+    android:layout_below="@+id/title_rl"
     android:background="@android:color/white"
-    tools:showIn="@layout/app_bar_main">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".activity.MainActivity">
 
     <LinearLayout
         android:id="@+id/toDoEmptyView"
@@ -16,56 +16,29 @@
         android:gravity="center"
         android:orientation="vertical">
 
-
         <ImageView
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/ic_iconfinder_24_2133056" />
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:padding="@dimen/_10sdp"
+            android:src="@drawable/ic_pdf" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical">
+            android:paddingTop="4dp"
+            android:paddingBottom="8dp"
+            android:text="You don't have any PDF files"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="4dp"
-                android:paddingBottom="8dp"
-                android:text="You don't have any PDF documents"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="20sp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="4dp"
-                android:paddingBottom="8dp"
-                android:text="Start a new PDF conversion by tapping the"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15sp" />
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                app:backgroundTint="@color/colorAccent"
-                android:tint="@android:color/white"
-                app:fabSize="mini"
-                android:src="@drawable/ic_add_black_24dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:paddingTop="4dp"
-                android:paddingBottom="8dp"
-                android:text="button below"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="15sp" />
-
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Create new PDF file now"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="15sp" />
     </LinearLayout>
 
     <com.imagetopdf.converter.Utils.RecyclerViewEmptySupport

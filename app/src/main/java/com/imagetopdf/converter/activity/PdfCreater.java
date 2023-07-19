@@ -19,9 +19,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -34,6 +35,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.imagetopdf.converter.R;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
+import java.io.File;
 import java.util.ArrayList;
 
 
@@ -60,28 +62,27 @@ public class PdfCreater extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pdf_creater);
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
+
+        Toolbar toolbar = findViewById(R.id.title_rl);
+        setSupportActionBar(toolbar);
+
         mListParentView = findViewById(R.id.listParentView);
         collageTool = findViewById(R.id.collageOption);
-        /*FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
         InitializeComponent();
 
         document = new PdfDocument(this);
         document.DoLayout();
+
+        findViewById(R.id.ivBack).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_pdfcreater, menu);
         return true;
     }
@@ -95,49 +96,47 @@ public class PdfCreater extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.savepdf_menu:
-                final Dialog dialog = new Dialog(this);
-                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                final View alertView = getLayoutInflater().inflate(R.layout.collagesave, null);
-                dialog.setContentView(alertView);
-                dialog.setCancelable(true);
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.copyFrom(dialog.getWindow().getAttributes());
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                dialog.show();
-                dialog.getWindow().setAttributes(lp);
-                final EditText edittext = (EditText) alertView.findViewById(R.id.editText2);
-                ((ImageButton) dialog.findViewById(R.id.bt_close)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-                ((Button) dialog.findViewById(R.id.bt_save)).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (ContextCompat.checkSelfPermission(PdfCreater.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        if (item.getItemId() == R.id.savepdf_menu) {
+            final Dialog dialog = new Dialog(this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            final View alertView = getLayoutInflater().inflate(R.layout.collagesave, null);
+            dialog.setContentView(alertView);
+            dialog.setCancelable(true);
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            dialog.show();
+            dialog.getWindow().setAttributes(lp);
+            final EditText edittext = (EditText) alertView.findViewById(R.id.editText2);
+            ((ImageButton) dialog.findViewById(R.id.bt_close)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+            ((Button) dialog.findViewById(R.id.bt_save)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ContextCompat.checkSelfPermission(PdfCreater.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                            CheckStoragePermission();
+                        CheckStoragePermission();
+                    } else {
+                        String fileName = edittext.getText().toString();
+                        if (!fileName.equals("")) {
+                            document.PrintPDF(fileName);
+                            dialog.dismiss();
                         } else {
-                            String fileName = edittext.getText().toString();
-                            if (!fileName.equals("")) {
-                                document.PrintPDF(fileName);
-                                dialog.dismiss();
-                            } else {
-                                Snackbar.make(v, "File name should not be empty", Snackbar.LENGTH_LONG).show();
-                            }
-
+                            Snackbar.make(v, "File name should not be empty", Snackbar.LENGTH_LONG).show();
                         }
-                    }
-                });
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+                    }
+                }
+            });
+
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public LinearLayout GetPdfParentView() {
@@ -306,17 +305,18 @@ public class PdfCreater extends AppCompatActivity {
         this.progressBarPercentage.setText(percentage + "%");
     }
 
-    public void runPostExecution(Boolean isMergeSuccess) {
+    public void runPostExecution(File filepath) {
         bottomSheetDialog.dismiss();
         progressBarPercentage.setText("0%");
         this.progressBar.setProgress(0);
-        makeResult();
+        makeResult(filepath);
     }
 
-    public void makeResult() {
-        Intent i = new Intent();
-        this.setResult(RESULT_OK, i);
-        this.finish();
+    public void makeResult(File filepath) {
+        Toast.makeText(this, "PDF created successfully", Toast.LENGTH_SHORT).show();
+        Intent i = new Intent(this, SavedActivity.class);
+        i.putExtra("FILEPATH",filepath.getAbsolutePath());
+        startActivity(i);
     }
 
     private void CheckStoragePermission() {

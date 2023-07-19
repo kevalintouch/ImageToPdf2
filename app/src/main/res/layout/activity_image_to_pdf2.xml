@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/myCoordinatorLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/title_rl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:background="@drawable/circle_gray2"
+                android:foreground="@drawable/ripple_effect"
+                android:padding="@dimen/_5sdp"
+                android:src="@drawable/img_back" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_toEndOf="@+id/ivBack"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Edit Images"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/_12sdp" />
+
+            <ImageView
+                android:id="@+id/fabadd"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:layout_toStartOf="@+id/collageit"
+                android:foreground="@drawable/ripple_effect"
+                android:padding="@dimen/_2sdp"
+                android:src="@drawable/ic_add_black_24dp"
+                android:tint="@color/dark_blue" />
+
+            <ImageView
+                android:id="@+id/collageit"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:foreground="@drawable/ripple_effect"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/ic_collage"
+                android:tint="@color/dark_blue"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/ivSort"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_25sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_gravity="center"
+                android:layout_marginEnd="@dimen/_8sdp"
+                android:foreground="@drawable/ripple_effect"
+                android:padding="@dimen/_6sdp"
+                android:src="@drawable/ic_sort"
+                android:tint="@color/dark_blue"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+
+    <com.imagetopdf.converter.Utils.RecyclerViewEmptySupport
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/title_rl"
+        android:scrollbars="vertical"
+        android:scrollingCache="true" />
+
+    <TextView
+        android:id="@+id/converttopdf"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:background="@drawable/bg_blue"
+        android:elevation="4dp"
+        android:fontFamily="@font/jost_regular"
+        android:gravity="center"
+        android:paddingStart="@dimen/_35sdp"
+        android:paddingTop="@dimen/_8sdp"
+        android:paddingEnd="@dimen/_35sdp"
+        android:paddingBottom="@dimen/_8sdp"
+        android:text="@string/convert_to_pdf"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_12sdp"
+        android:textStyle="bold" />
+
+
+</RelativeLayout>
