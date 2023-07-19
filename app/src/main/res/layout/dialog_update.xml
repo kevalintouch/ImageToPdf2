@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_black"
+    android:padding="@dimen/_16sdp">
+
+    <TextView
+        android:id="@+id/tv_dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/update"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_14sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_dialog_title_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="10dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/update_text"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_11sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title" />
+
+    <TextView
+        android:id="@+id/tv_submit"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_15sdp"
+        android:background="@drawable/bg_white"
+        android:foreground="@drawable/ripple_effect"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:paddingStart="10dp"
+        android:paddingTop="@dimen/_5sdp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="@dimen/_5sdp"
+        android:text="@string/update"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/tv_maybe_later"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title_2" />
+
+    <TextView
+        android:id="@+id/tv_maybe_later"
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_blue"
+        android:foreground="@drawable/ripple_effect"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:paddingStart="10dp"
+        android:paddingTop="@dimen/_5sdp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="@dimen/_5sdp"
+        android:text="@string/maybe_later"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_13sdp"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_submit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/tv_submit"
+        app:layout_constraintTop_toTopOf="@+id/tv_submit" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#388E3C</color>
+    <color name="colorPrimaryDark">@color/main_bg1</color>
+    <color name="colorAccent">#23C40C</color>
+    <color name="white">#FFFFFF</color>
+    <color name="banner">#8D242920</color>
+    <color name="pointer">#B9B7B7</color>
+    <color name="overlay">#4A32740A</color>
+    <color name="grey_5">#F2F2F2</color>
+    <color name="grey_90">#263238</color>
+    <color name="grey_91">#C6263238</color>
+    <color name="grey_40">#999999</color>
+    <color name="dark_grey">#ff1c1d21</color>
+    <color name="dark_grey_more">#ff232323</color>
+    <color name="white_blur">#ffc8c8c8</color>
+    <color name="colorAccentDark">#ff0f60cf</color>
+    <color name="black">#000000</color>
+    <color name="dark_blue">#002B5B</color>
+    <color name="black1">#40000000</color>
+    <color name="main_bg1">#DAECFF</color>
+    <color name="grey_1">#868686</color>
+    <color name="grey_2">#D9D9D9</color>
+    <color name="grey_3">#B3C0CE</color>
+</resources>

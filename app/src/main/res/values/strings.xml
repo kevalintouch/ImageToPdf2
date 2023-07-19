@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">Image to PDF Converter</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Image To PDF</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">My Documents</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string name="title_activity_pdf_creater">PdfCreater</string>
+
+    <string name="text_images">Import (%1$d)</string>
+    <string name="text_title_activity_album">Select photos</string>
+    <string name="text_title_dialog_sort_by_album">Sort album by</string>
+    <string name="text_title_dialog_sort_by_photo">Sort photo by</string>
+    <string name="action_sort">sort</string>
+
+    <string-array name="array_sort_value">
+        <item>Name</item>
+        <item>Size</item>
+        <item>Date</item>
+    </string-array>
+
+    <string name="do_you_like_our_app">do you like our app</string>
+    <string name="submit">Submit</string>
+    <string name="give_us_a_quick_rating_so_we_know_if_you_like_it">Give us a quick rating so we know if you like it</string>
+    <string name="thank_for_rating">Thank for rating</string>
+
+    <string name="update">Update</string>
+    <string name="update_text">Updated version with many performance improvements and new features. Update your apps now!</string>
+    <string name="maybe_later">Maybe later</string>
+    <string name="image_to_pd">Image to PDF</string>
+    <string name="image_to_pd1">Import Images or Scan with your Camera to \ngenerate PDFs</string>
+</resources>
