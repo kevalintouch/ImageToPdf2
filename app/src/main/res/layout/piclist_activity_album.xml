@@ -77,6 +77,18 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/title_rl" />
 
+    <RelativeLayout
+        android:id="@+id/adsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_55sdp"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutBottom" />
+
     <LinearLayout
         android:id="@+id/layoutBottom"
         android:layout_width="fill_parent"
@@ -96,8 +108,8 @@
             android:id="@+id/horizontalScrollView"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_2sdp"
-            android:layout_gravity="center_vertical">
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="@dimen/_2sdp">
 
             <LinearLayout
                 android:id="@+id/layoutListItemSelect"
@@ -111,9 +123,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
             android:background="@drawable/bg_blue"
             android:gravity="center_vertical|end"
-            android:layout_marginEnd="@dimen/_5sdp"
             android:paddingStart="@dimen/_20sdp"
             android:paddingTop="@dimen/_5sdp"
             android:paddingEnd="@dimen/_20sdp"
@@ -124,12 +137,4 @@
             android:textColor="@color/white" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/adsContainer"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutBottom" />
 </androidx.constraintlayout.widget.ConstraintLayout>

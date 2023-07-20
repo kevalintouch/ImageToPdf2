@@ -1,118 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_black"
-    android:padding="@dimen/_16sdp">
+    android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_dialog_title"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:text="@string/do_you_like_our_app"
-        android:textAllCaps="true"
-        android:textColor="@color/white"
-        android:textSize="@dimen/_14sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tv_dialog_title_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:text="@string/give_us_a_quick_rating_so_we_know_if_you_like_it"
-        android:textColor="@color/white"
-        android:textSize="@dimen/_11sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title" />
-
-    <LinearLayout
-        android:id="@+id/rating_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title_2">
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/rate1"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/custom_rate" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/rate2"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/custom_rate" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/rate3"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/custom_rate" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/rate4"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginEnd="10dp"
-            android:src="@drawable/custom_rate" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/rate5"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@drawable/custom_rate" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv_submit"
-        android:layout_width="@dimen/_100sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_marginTop="24dp"
+        android:layout_below="@+id/emoji"
+        android:layout_marginTop="-20dp"
         android:background="@drawable/bg_white"
-        android:foreground="@drawable/ripple_effect"
-        android:gravity="center"
-        android:paddingStart="10dp"
-        android:paddingTop="5dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="2dp"
-        android:text="@string/submit"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="@dimen/_13sdp"
-        app:layout_constraintEnd_toStartOf="@id/tv_maybe_later"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rating_layout" />
+        android:padding="@dimen/_16sdp">
 
-    <TextView
-        android:id="@+id/tv_maybe_later"
-        android:layout_width="@dimen/_100sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/bg_blue"
-        android:foreground="@drawable/ripple_effect"
-        android:gravity="center"
-        android:paddingStart="10dp"
-        android:paddingTop="5dp"
-        android:paddingEnd="10dp"
-        android:paddingBottom="5dp"
-        android:text="@string/maybe_later"
-        android:textColor="@color/white"
-        android:textSize="@dimen/_13sdp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/tv_submit"
-        app:layout_constraintTop_toBottomOf="@+id/rating_layout" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:fontFamily="@font/kumbhsans"
+            android:text="@string/do_you_like_our_app"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_14sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/rating_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_dialog_title">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rate1"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/custom_rate" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rate2"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/custom_rate" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rate3"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/custom_rate" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rate4"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/custom_rate" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/rate5"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/custom_rate" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_submit"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_blue"
+            android:foreground="@drawable/ripple_effect"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="@string/rate"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintEnd_toStartOf="@id/tv_maybe_later"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rating_layout" />
+
+        <TextView
+            android:id="@+id/tv_maybe_later"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_dark_stroke"
+            android:foreground="@drawable/ripple_effect"
+            android:gravity="center"
+            android:paddingStart="10dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="5dp"
+            android:text="@string/maybe_later"
+            android:textColor="@color/dark_blue"
+            android:textSize="@dimen/_13sdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_submit"
+            app:layout_constraintTop_toBottomOf="@+id/rating_layout" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/emoji"
+        android:layout_width="@dimen/_35sdp"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_marginStart="@dimen/_20sdp"
+        android:background="@drawable/circle_white"
+        android:padding="@dimen/_5sdp"
+        android:src="@drawable/emoji" />
+</RelativeLayout>

@@ -11,4 +11,5 @@
     <dimen name="spacing_medium">5dp</dimen>
     <dimen name="spacing_xmedium">7dp</dimen>
     <dimen name="spacing_smlarge">18dp</dimen>
+    <dimen name="ad_native_size">155dp</dimen>
 </resources>

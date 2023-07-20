@@ -18,6 +18,9 @@ import com.shockwave.pdfium.PdfiumCore;
 
 public class Helper {
     public static boolean is_show_open_ad = true;
+    public static int showAdsNumberCount = 1;
+    public static final String REMOVE_ADS_KEY = "REMOVE_ADS";
+    public static String REMOVE_ADS_PRODUCT_ID = "ad.free_remove.ads";
 
     public static void openUpdateDialog(Context context) {
         Dialog dialog = new Dialog(context, R.style.CustomDialog);

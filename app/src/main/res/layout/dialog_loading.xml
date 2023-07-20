@@ -25,8 +25,8 @@
 
             <ProgressBar
                 android:id="@+id/round_progress"
-                android:layout_width="@dimen/_70sdp"
-                android:layout_height="@dimen/_70sdp"
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
                 android:layout_centerHorizontal="true"
                 android:visibility="visible" />
 
@@ -40,7 +40,7 @@
                 android:lineSpacingExtra="@dimen/_5sdp"
                 android:text="Please wait..."
                 android:textAllCaps="false"
-                android:textColor="@color/white"
+                android:textColor="@color/dark_blue"
                 android:textSize="@dimen/_14sdp" />
         </RelativeLayout>
     </RelativeLayout>

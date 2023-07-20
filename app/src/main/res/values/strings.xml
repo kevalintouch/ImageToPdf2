@@ -27,7 +27,7 @@
         <item>Date</item>
     </string-array>
 
-    <string name="do_you_like_our_app">do you like our app</string>
+    <string name="do_you_like_our_app">We are working hard for better User Experience You can rate Us!</string>
     <string name="submit">Submit</string>
     <string name="give_us_a_quick_rating_so_we_know_if_you_like_it">Give us a quick rating so we know if you like it</string>
     <string name="thank_for_rating">Thank for rating</string>
@@ -38,4 +38,6 @@
     <string name="image_to_pd">Image to PDF</string>
     <string name="image_to_pd1">Import Images or Scan with your Camera to \ngenerate PDFs</string>
     <string name="convert_to_pdf">Convert to PDF</string>
+    <string name="rate">Rate</string>
+    <string name="exit">Exit</string>
 </resources>

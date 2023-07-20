@@ -13,6 +13,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.billingclient.api.AcknowledgePurchaseParams;
+import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.BillingResult;
+import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesResponseListener;
+import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.appizona.yehiahd.fastsave.FastSave;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
@@ -35,9 +44,12 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 
 
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements PurchasesUpdatedListener {
     public static final String[] PERMISSIONS_S = {"android.permission.READ_MEDIA_IMAGES"};
     public static final String[] PERMISSIONS = {"android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"};
+    private BillingClient mBillingClient;
+    boolean in_app_check = false;
+    boolean Ad_Show = false;
 
     @Override
     protected void onCreate(Bundle bundle) {
@@ -47,14 +59,53 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         Helper.is_show_open_ad = false;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+        setView();
+
+
+    }
+
+    private void setView() {
+        BillingClient build = BillingClient.newBuilder(this).enablePendingPurchases().setListener(this).build();
+        this.mBillingClient = build;
+        build.startConnection(new BillingClientStateListener() { // from class: mobi.bluetooth.shortcut.vs.SplashActivity.2
+            @Override
+            public void onBillingServiceDisconnected() {
+            }
+
+            @Override
+            public void onBillingSetupFinished(BillingResult billingResult) {
+                try {
+                    SplashActivity.this.mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType("inapp").build(), new PurchasesResponseListener() { // from class: mobi.bluetooth.shortcut.vs.SplashActivity.2.1
+                        @Override
+                        public void onQueryPurchasesResponse(BillingResult billingResult2, List<Purchase> list) {
+                            if (list.toString().contains(Helper.REMOVE_ADS_PRODUCT_ID)) {
+                                SplashActivity.this.in_app_check = true;
+                            } else {
+                                SplashActivity.this.in_app_check = false;
+                            }
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        queryPurchases();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             TedPermission.create().setPermissions(PERMISSIONS_S).setDeniedMessage("If you reject this permission,you can not use this app because it is highly needed for search all images from your device.\n\nPlease turn on permissions at [Setting] > [Permission]").setPermissionListener(new PermissionListener() {
                 @Override
                 public void onPermissionGranted() {
-                    if (isNetworkAvailable()) {
-                        getdata();
+                    if (SplashActivity.this.in_app_check) {
+                        FastSave.getInstance().saveBoolean(Helper.REMOVE_ADS_KEY, true);
+                        SplashActivity.this.ContinueWithoutAdsProcess();
+                    } else if (FastSave.getInstance().getBoolean(Helper.REMOVE_ADS_KEY, false)) {
+                        SplashActivity.this.ContinueWithoutAdsProcess();
                     } else {
-                        ContinueWithoutAdsProcess();
+                        if (isNetworkAvailable()) {
+                            getdata();
+                        } else {
+                            ContinueWithoutAdsProcess();
+                        }
                     }
                 }
 
@@ -63,14 +114,21 @@ public class SplashActivity extends AppCompatActivity {
                     finish();
                 }
             }).check();
-        }else{
+        } else {
             TedPermission.create().setPermissions(PERMISSIONS).setDeniedMessage("If you reject this permission,you can not use this app because it is highly needed for search all images from your device.\n\nPlease turn on permissions at [Setting] > [Permission]").setPermissionListener(new PermissionListener() {
                 @Override
                 public void onPermissionGranted() {
-                    if (isNetworkAvailable()) {
-                        getdata();
+                    if (SplashActivity.this.in_app_check) {
+                        FastSave.getInstance().saveBoolean(Helper.REMOVE_ADS_KEY, true);
+                        SplashActivity.this.ContinueWithoutAdsProcess();
+                    } else if (FastSave.getInstance().getBoolean(Helper.REMOVE_ADS_KEY, false)) {
+                        SplashActivity.this.ContinueWithoutAdsProcess();
                     } else {
-                        ContinueWithoutAdsProcess();
+                        if (isNetworkAvailable()) {
+                            getdata();
+                        } else {
+                            ContinueWithoutAdsProcess();
+                        }
                     }
                 }
 
@@ -201,6 +259,56 @@ public class SplashActivity extends AppCompatActivity {
         } else {
             // Ad not ready, redirect to the main screen.
             ContinueAfterAdsProcess();
+        }
+    }
+
+    private void queryPurchases() {
+        this.mBillingClient.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType("inapp").build(), new PurchasesResponseListener() {
+            @Override
+            public void onQueryPurchasesResponse(BillingResult billingResult, List<Purchase> list) {
+                if (list == null || list.isEmpty()) {
+                    return;
+                }
+                for (Purchase purchase : list) {
+                    if (purchase.getProducts().contains(Helper.REMOVE_ADS_PRODUCT_ID)) {
+                        FastSave.getInstance().saveBoolean(Helper.REMOVE_ADS_KEY, true);
+                    }
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onPurchasesUpdated(BillingResult billingResult, List<Purchase> list) {
+        if (billingResult.getResponseCode() == 0 && list != null) {
+            for (Purchase purchase : list) {
+                handlePurchase(purchase);
+            }
+        } else if (billingResult.getResponseCode() == 1) {
+            Log.d("str", "User Canceled" + billingResult.getResponseCode());
+        } else if (billingResult.getResponseCode() == 7) {
+            FastSave.getInstance().saveBoolean(Helper.REMOVE_ADS_KEY, true);
+        }
+    }
+
+    private void handlePurchase(Purchase purchase) {
+        if (purchase.getPurchaseState() == 1) {
+            AcknowledgePurchaseResponseListener acknowledgePurchaseResponseListener = new AcknowledgePurchaseResponseListener() {
+                @Override
+                public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+                    Log.e("result", "" + billingResult.getResponseCode() + "::" + billingResult.getDebugMessage());
+                    if (billingResult.getResponseCode() == 0) {
+                        FastSave.getInstance().saveBoolean(Helper.REMOVE_ADS_KEY, true);
+                        SplashActivity.this.ContinueWithoutAdsProcess();
+                    }
+                }
+            };
+            if (!purchase.isAcknowledged()) {
+                this.mBillingClient.acknowledgePurchase(AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build(), acknowledgePurchaseResponseListener);
+            } else if (purchase.getProducts().contains(Helper.REMOVE_ADS_PRODUCT_ID)) {
+                FastSave.getInstance().saveBoolean(Helper.REMOVE_ADS_KEY, true);
+                ContinueWithoutAdsProcess();
+            }
         }
     }
 

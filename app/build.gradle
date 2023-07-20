@@ -7,7 +7,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.imagetopdf.converter"
+        applicationId "com.imagetopdf.converter.pdf"
         minSdk 24
         targetSdk 33
         versionCode 1
@@ -54,6 +54,8 @@ dependencies {
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     implementation 'com.github.yehiahd:FastSave-Android:1.0.6'
     implementation 'com.loopj.android:android-async-http:1.4.11'
+
+    implementation 'com.android.billingclient:billing:6.0.1'
 
     implementation 'com.google.android.gms:play-services-ads:20.6.0'
     implementation 'androidx.lifecycle:lifecycle-process:2.5.1'

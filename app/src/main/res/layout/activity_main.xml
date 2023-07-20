@@ -47,12 +47,13 @@
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/ad_layout"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/_10sdp"
         android:background="@drawable/bg_blue"
         android:elevation="4dp"
         android:fontFamily="@font/jost_regular"
+        android:foreground="@drawable/ripple_effect"
         android:gravity="center"
         android:paddingStart="@dimen/_35sdp"
         android:paddingTop="@dimen/_8sdp"
@@ -72,4 +73,11 @@
         android:layout_gravity="center"
         android:visibility="gone" />
 
+    <RelativeLayout
+        android:id="@+id/ad_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_55sdp"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom"
+        android:visibility="visible"/>
 </RelativeLayout>

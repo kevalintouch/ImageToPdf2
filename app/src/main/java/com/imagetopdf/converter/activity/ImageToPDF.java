@@ -1,5 +1,7 @@
 package com.imagetopdf.converter.activity;
 
+import static com.imagetopdf.converter.Utils.Helper.showAdsNumberCount;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -34,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.AppCompatCheckBox;
@@ -45,6 +48,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.appizona.yehiahd.fastsave.FastSave;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.snackbar.Snackbar;
 import com.imagetopdf.converter.Adapter.AdapterGridBasic;
 import com.imagetopdf.converter.Adapter.ImageDocument;
@@ -52,9 +62,11 @@ import com.imagetopdf.converter.Adapter.SpacingItemDecoration;
 import com.imagetopdf.converter.BuildConfig;
 import com.imagetopdf.converter.R;
 import com.imagetopdf.converter.Utils.FileComparator;
+import com.imagetopdf.converter.Utils.Helper;
 import com.imagetopdf.converter.Utils.ImageToPDFAsync;
 import com.imagetopdf.converter.Utils.ItemTouchHelperClass;
 import com.imagetopdf.converter.Utils.RecyclerViewEmptySupport;
+import com.imagetopdf.converter.ads.AdmobAdsHelper;
 import com.imagetopdf.converter.photopicker.activity.PickImageActivity;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 import com.theartofdev.edmodo.cropper.CropImage;
@@ -110,6 +122,7 @@ public class ImageToPDF extends AppCompatActivity {
     }
 
     private void InitFabButtons() {
+        new AdmobAdsHelper(this).bannerAds(this,findViewById(R.id.ad_layout));
         setSupportActionBar(findViewById(R.id.title_rl));
         findViewById(R.id.converttopdf).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,13 +138,6 @@ public class ImageToPDF extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.collageit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startImageToPDF();
-            }
-
-        });
         findViewById(R.id.ivBack).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -151,15 +157,6 @@ public class ImageToPDF extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
-    }
-
-    private void startImageToPDF() {
-        if (documents.size() < 1) {
-            Toast.makeText(this, "You need to add at least 1 image file", Toast.LENGTH_LONG).show();
-        } else {
-            Intent intent = new Intent(getApplicationContext(), PdfCreater.class);
-            startActivityForResult(intent, REQUEST_COLLAGE);
-        }
     }
 
     private void convertToPDF() {
@@ -252,11 +249,7 @@ public class ImageToPDF extends AppCompatActivity {
             ((Button) dialog.findViewById(R.id.bt_save)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-                        CheckStoragePermission();
-                    } else {
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
                         String fileName = edittext.getText().toString();
 
                         if (!fileName.equals("")) {
@@ -274,8 +267,29 @@ public class ImageToPDF extends AppCompatActivity {
                         } else {
                             Snackbar.make(v, "File name should not be empty", Snackbar.LENGTH_LONG).show();
                         }
-                    }
+                    }else{
+                        if (ContextCompat.checkSelfPermission(mainActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                            CheckStoragePermission();
+                        } else {
+                            String fileName = edittext.getText().toString();
 
+                            if (!fileName.equals("")) {
+                                ImageToPDFAsync converter = new ImageToPDFAsync(mainActivity, documents, fileName, null);
+                                if (securePDF.isChecked()) {
+                                    String password = passwordText.getText().toString();
+                                    converter.setPassword(password);
+                                }
+                                converter.setPageOrientation(spn_timezone.getSelectedItem().toString());
+                                converter.setPageMargin(pageMargin.getSelectedItem().toString());
+                                converter.setPageSize(pageSize.getSelectedItem().toString());
+                                converter.setCompression(compression.getSelectedItem().toString());
+                                converter.execute();
+                                dialog.dismiss();
+                            } else {
+                                Snackbar.make(v, "File name should not be empty", Snackbar.LENGTH_LONG).show();
+                            }
+                        }
+                    }
                 }
             });
 
@@ -410,16 +424,6 @@ public class ImageToPDF extends AppCompatActivity {
 
     private void addToDataStore(ImageDocument item) {
         documents.add(item);
-
-        /*if (comparator != null) {
-            FileComparator.isDescending = isChecked;
-            sortFiles(comparator);
-        } else {
-            comparator = FileComparator.getLastModifiedFileComparator();
-            FileComparator.isDescending = isChecked;
-            sortFiles(comparator);
-        }*/
-
         mAdapter.notifyItemInserted(documents.size() - 1);
     }
 
@@ -526,6 +530,7 @@ public class ImageToPDF extends AppCompatActivity {
         Intent i = new Intent(ImageToPDF.this, SavedActivity.class);
         i.putExtra("FILEPATH",filepath.getAbsolutePath());
         startActivity(i);
+        ShowFullAds(ImageToPDF.this);
     }
 
     private void CheckStoragePermission() {
@@ -554,7 +559,6 @@ public class ImageToPDF extends AppCompatActivity {
         }
     }
 
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     private void deleteItems() {
         List<Integer> selectedItemPositions = mAdapter.getSelectedItems();
         for (int i = selectedItemPositions.size() - 1; i >= 0; i--) {
@@ -631,7 +635,6 @@ public class ImageToPDF extends AppCompatActivity {
 
     }
 
-    //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     private MenuItem mainMenuItem;
     private boolean isChecked = false;
 
@@ -687,10 +690,83 @@ public class ImageToPDF extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-    //>>>>>>>>>.
 
     private void sortFiles(Comparator<ImageDocument> comparator) {
         Collections.sort(mAdapter.items, comparator);
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!FastSave.getInstance().getBoolean(Helper.REMOVE_ADS_KEY, false)) {
+            LoadFullAd(this);
+        }
+    }
+
+    InterstitialAd ad_mob_interstitial;
+    AdRequest interstitial_adRequest;
+    public void LoadFullAd(Context context) {
+        Log.e("TAG", "LoadFullAd: ");
+        try {
+            Bundle non_personalize_bundle = new Bundle();
+            non_personalize_bundle.putString("npa", "1");
+
+            interstitial_adRequest = new AdRequest.Builder().build();
+
+            InterstitialAd.load(context, FastSave.getInstance().getString("INTER",""), interstitial_adRequest, new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    ad_mob_interstitial = interstitialAd;
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    ad_mob_interstitial = null;
+                    Log.e("TAG", "AdError1: " +loadAdError.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    public void ShowFullAds(final Context context) {
+        if (ad_mob_interstitial != null) {
+            ad_mob_interstitial.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    Helper.is_show_open_ad = true;
+                    Log.e("TAG", "onAdDismissedFullScreenContent: ");
+                    LoadFullAd(context);
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                    Log.e("TAG", "AdError: " +adError.getMessage());
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    ad_mob_interstitial = null;
+                }
+            });
+        }
+        int i = showAdsNumberCount + 1;
+        showAdsNumberCount = i;
+        if (FastSave.getInstance().getInt("CLICKS", -1) < i) {
+            if (ad_mob_interstitial != null) {
+                ad_mob_interstitial.show(this);
+            }
+            Helper.is_show_open_ad = false;
+            showAdsNumberCount = 0;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        ShowFullAds(this);
+        finish();
     }
 }

@@ -1,9 +1,11 @@
 package com.imagetopdf.converter.photopicker.activity;
 
+import static com.imagetopdf.converter.Utils.Helper.showAdsNumberCount;
 import static com.imagetopdf.converter.activity.ImageToPDF.READ_REQUEST_CODE;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -30,10 +32,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.appizona.yehiahd.fastsave.FastSave;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.imagetopdf.converter.R;
+import com.imagetopdf.converter.Utils.Helper;
 import com.imagetopdf.converter.activity.ImageToPDF;
+import com.imagetopdf.converter.ads.AdmobAdsHelper;
 import com.imagetopdf.converter.photopicker.Constants;
 import com.imagetopdf.converter.photopicker.adapter.AlbumAdapter;
 import com.imagetopdf.converter.photopicker.adapter.ListAlbumAdapter;
@@ -193,12 +204,8 @@ public class PickImageActivity extends AppCompatActivity implements View.OnClick
         this.horizontalScrollView.getLayoutParams().height = this.pWHItemSelected;
         this.gridViewAlbum = findViewById(R.id.gridViewAlbum);
 
-        Handler mHandler = new Handler() {
-            public void handleMessage(Message message) {
-                super.handleMessage(message);
 
-            }
-        };
+        new AdmobAdsHelper(this).bannerAds(this,findViewById(R.id.adsContainer));
         try {
             Collections.sort(this.dataAlbum, new Comparator<ImageModel>() {
                 public int compare(ImageModel imageModel, ImageModel imageModel2) {
@@ -454,6 +461,7 @@ public class PickImageActivity extends AppCompatActivity implements View.OnClick
         intent.putExtra("ActivityAction", "FileSearch");
         intent.putStringArrayListExtra(KEY_DATA_RESULT, arrayList);
         startActivityForResult(intent, READ_REQUEST_CODE);
+        ShowFullAds(PickImageActivity.this);
     }
 
 
@@ -493,7 +501,8 @@ public class PickImageActivity extends AppCompatActivity implements View.OnClick
             ((TextView) findViewById(R.id.tvTitle)).setText((CharSequence) getResources().getString(R.string.text_title_activity_album));
             return;
         }
-        super.onBackPressed();
+        ShowFullAds(this);
+        finish();
     }
 
     public static DisplayMetrics getDisplayInfo(Activity activity) {
@@ -601,4 +610,72 @@ public class PickImageActivity extends AppCompatActivity implements View.OnClick
         }
         Toast.makeText(this, "Limit " + this.limitImageMax + " images", Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!FastSave.getInstance().getBoolean(Helper.REMOVE_ADS_KEY, false)) {
+            LoadFullAd(this);
+        }
+    }
+
+    InterstitialAd ad_mob_interstitial;
+    AdRequest interstitial_adRequest;
+    public void LoadFullAd(Context context) {
+        Log.e("TAG", "LoadFullAd: ");
+        try {
+            Bundle non_personalize_bundle = new Bundle();
+            non_personalize_bundle.putString("npa", "1");
+
+            interstitial_adRequest = new AdRequest.Builder().build();
+
+            InterstitialAd.load(context, FastSave.getInstance().getString("INTER",""), interstitial_adRequest, new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    ad_mob_interstitial = interstitialAd;
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    ad_mob_interstitial = null;
+                    Log.e("TAG", "AdError1: " +loadAdError.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    public void ShowFullAds(final Context context) {
+        if (ad_mob_interstitial != null) {
+            ad_mob_interstitial.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    Helper.is_show_open_ad = true;
+                    LoadFullAd(context);
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                    Log.e("TAG", "AdError: " +adError.getMessage());
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    ad_mob_interstitial = null;
+                }
+            });
+        }
+        int i = showAdsNumberCount + 1;
+        showAdsNumberCount = i;
+        if (FastSave.getInstance().getInt("CLICKS", -1) < i) {
+            if (ad_mob_interstitial != null) {
+                ad_mob_interstitial.show(this);
+            }
+            Helper.is_show_open_ad = false;
+            showAdsNumberCount = 0;
+        }
+    }
+
 }

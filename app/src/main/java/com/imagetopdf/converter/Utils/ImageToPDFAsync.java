@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
 public class ImageToPDFAsync extends AsyncTask<Void, Integer, File> {
 
@@ -96,10 +97,10 @@ public class ImageToPDFAsync extends AsyncTask<Void, Integer, File> {
                 InputStream stream = imageToPDF.getContentResolver().openInputStream(document.getImageDocument());
                 Image image = null;
                 if (isJpeg(stream)) {
-                    if (this.compression == "Medium") {
+                    if (Objects.equals(this.compression, "Medium")) {
                         bitmap = Glide.with(imageToPDF).asBitmap().load(document.getImageDocument()).override(1000, 1000)
                                 .submit().get();
-                    } else if (this.compression == "High") {
+                    } else if (Objects.equals(this.compression, "High")) {
                         bitmap = Glide.with(imageToPDF).asBitmap().load(document.getImageDocument()).override(500, 500)
                                 .submit().get();
                     }

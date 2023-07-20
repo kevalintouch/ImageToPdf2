@@ -1,5 +1,6 @@
 package com.imagetopdf.converter.activity;
 
+import static com.imagetopdf.converter.Utils.Helper.showAdsNumberCount;
 import static com.imagetopdf.converter.activity.ImageToPDF.READ_REQUEST_CODE;
 
 import android.Manifest;
@@ -7,6 +8,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,16 +16,17 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.Toolbar;
@@ -34,12 +37,21 @@ import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.appizona.yehiahd.fastsave.FastSave;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.imagetopdf.converter.Adapter.MainRecycleViewAdapter;
 import com.imagetopdf.converter.BuildConfig;
 import com.imagetopdf.converter.R;
 import com.imagetopdf.converter.Utils.FileComparator;
+import com.imagetopdf.converter.Utils.Helper;
 import com.imagetopdf.converter.Utils.RecyclerViewEmptySupport;
+import com.imagetopdf.converter.ads.AdmobAdsHelper;
 import com.imagetopdf.converter.photopicker.activity.PickImageActivity;
 import com.mikhaellopez.circularprogressbar.CircularProgressBar;
 
@@ -107,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        new AdmobAdsHelper(this).bannerAds(this, findViewById(R.id.ad_layout));
     }
 
     public void StartMergeActivity() {
@@ -114,10 +127,12 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(PickImageActivity.KEY_LIMIT_MAX_IMAGE, 9);
         intent.putExtra(PickImageActivity.KEY_LIMIT_MIN_IMAGE, 1);
         startActivityForResult(intent, READ_REQUEST_CODE);
+        ShowFullAds(this);
     }
 
     @Override
     public void onBackPressed() {
+        ShowFullAds(this);
         finish();
     }
 
@@ -179,42 +194,6 @@ public class MainActivity extends AppCompatActivity {
     private void sortFiles(Comparator<File> comparator) {
         Collections.sort(mAdapter.items, comparator);
         mAdapter.notifyDataSetChanged();
-    }
-
-
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_rate_app) {
-            Intent goToMarket = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
-            goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-                    Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
-                    Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-            try {
-                startActivity(goToMarket);
-            } catch (ActivityNotFoundException anfe) {
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName())));
-            }
-        } else if (id == R.id.nav_share) {
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, "I am using PDF Merge tool to merge PDF,JPEG,PNG and HTML into single PDF. Download Now https://play.google.com/store/apps/details?id=" + getPackageName());
-            sendIntent.setType("text/plain");
-            startActivity(sendIntent);
-
-        } else if (id == R.id.nav_send) {
-            Intent Email = new Intent(Intent.ACTION_SEND);
-            Email.setType("text/email");
-            Email.putExtra(Intent.EXTRA_EMAIL, new String[]{"benzveen@gmail.com"});
-            Email.putExtra(Intent.EXTRA_SUBJECT, "Feedback");
-            startActivity(Intent.createChooser(Email, "Send Feedback"));
-        } else if (id == R.id.nav_about) {
-            showDialogAbout();
-        }
-        return true;
     }
 
     @Override
@@ -324,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
         items = new ArrayList<File>();
 
-        File root = getFilesDir();
+        File root = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
         File myDir = new File(root + "/ImageToPDF");
         if (!myDir.exists()) {
             myDir.mkdirs();
@@ -559,7 +538,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        mBottomSheetDialog = new BottomSheetDialog(this,R.style.CustomBottomSheetDialogTheme);
+        mBottomSheetDialog = new BottomSheetDialog(this, R.style.CustomBottomSheetDialogTheme);
         mBottomSheetDialog.setContentView(view);
         mBottomSheetDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 
@@ -589,62 +568,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
-    private void showDialogAbout() {
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // before
-        dialog.setContentView(R.layout.dialog_about);
-        dialog.setCancelable(true);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-
-        dialog.findViewById(R.id.bt_close).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.findViewById(R.id.bt_privcy).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialogPrivacy();
-            }
-        });
-        dialog.show();
-        dialog.getWindow().setAttributes(lp);
-    }
-
-    private void showDialogPrivacy() {
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE); // before
-        dialog.setContentView(R.layout.privacy_layout);
-        dialog.setCancelable(true);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-
-        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-        lp.copyFrom(dialog.getWindow().getAttributes());
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.MATCH_PARENT;
-
-        dialog.findViewById(R.id.bt_close).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        WebView webView = dialog.findViewById(R.id.privacy_webview);
-        webView.setVerticalScrollBarEnabled(true);
-        webView.loadUrl("file:///android_asset/Index.html");
-
-        dialog.getWindow().setAttributes(lp);
         dialog.show();
     }
 
@@ -717,4 +640,73 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!FastSave.getInstance().getBoolean(Helper.REMOVE_ADS_KEY, false)) {
+            LoadFullAd(this);
+        }
+    }
+
+    InterstitialAd ad_mob_interstitial;
+    AdRequest interstitial_adRequest;
+
+    public void LoadFullAd(Context context) {
+        Log.e("TAG", "LoadFullAd: ");
+        try {
+            Bundle non_personalize_bundle = new Bundle();
+            non_personalize_bundle.putString("npa", "1");
+
+            interstitial_adRequest = new AdRequest.Builder().build();
+
+            InterstitialAd.load(context, FastSave.getInstance().getString("INTER", ""), interstitial_adRequest, new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                    ad_mob_interstitial = interstitialAd;
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    ad_mob_interstitial = null;
+                    Log.e("TAG", "AdError1: " + loadAdError.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    public void ShowFullAds(final Context context) {
+        if (ad_mob_interstitial != null) {
+            ad_mob_interstitial.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    Helper.is_show_open_ad = true;
+                    LoadFullAd(context);
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                    Log.e("TAG", "AdError: " + adError.getMessage());
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    ad_mob_interstitial = null;
+                }
+            });
+        }
+        int i = showAdsNumberCount + 1;
+        showAdsNumberCount = i;
+        if (FastSave.getInstance().getInt("CLICKS", -1) < i) {
+            if (ad_mob_interstitial != null) {
+                ad_mob_interstitial.show(this);
+            }
+            Helper.is_show_open_ad = false;
+            showAdsNumberCount = 0;
+        }
+    }
+
 }
